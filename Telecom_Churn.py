@@ -1,5 +1,7 @@
 import numpy as np
 import pandas as pd
+import seaborn as sns
+from matplotlib import pyplot as plt
 from sklearn.preprocessing import OneHotEncoder, MinMaxScaler, StandardScaler
 
 
@@ -140,13 +142,43 @@ class Churn_Analysis:
         self.transformed_data = self.data.copy()
         print("\nData transformation completed!")
 
+    def descriptive_statistics(self):
+        """Calculating and printing measures of central tendency and dispersion, and visualizing data distribution."""
+
+        # Summary statistics for the entire dataset
+        print("\nDescriptive Statistics for the Transformed Dataset:")
+        print(self.data.describe().round(2))  # Summary statistics for all numeric columns
+
+
+        # Visualization 1: Histogram for MonthlyCharges
+        plt.figure(figsize=(8, 6))
+        sns.histplot(self.data['MonthlyCharges'], kde=True, bins=30)
+        plt.title('Distribution of Monthly Charges')
+        plt.xlabel('Monthly Charges')
+        plt.ylabel('Frequency')
+        plt.show()
+
+        # Check if Churn column exists after one-hot encoding
+        churn_column = 'Churn' if 'Churn' in self.data.columns else 'Churn_Yes'
+
+        # Visualization 2: Box plot for MonthlyCharges by Churn
+        plt.figure(figsize=(8, 6))
+        sns.boxplot(x=churn_column, y='MonthlyCharges', data=self.data)
+        plt.title('Monthly Charges as a Function of Churn')
+        plt.xlabel('Churn')
+        plt.ylabel('Monthly Charges')
+        plt.show()
+
+        print("\nDescriptive Statistics of the transformed Data completed !")
+
+
 
     def run_analysis(self):
         """ Running the complete churn analysis """
         print("\n Starting full analysis of the dataset")
         self.preprocess_data()
-
         self.transform_data()
+        self.descriptive_statistics()
 
 
 
