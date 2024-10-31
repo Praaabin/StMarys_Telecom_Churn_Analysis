@@ -87,6 +87,7 @@ class Churn_Analysis:
         print("\nPreprocessing completed!")
         print(f"Final shape of the dataset: {self.preprocessed_data.shape}")
 
+
     def transform_data(self):
         """Data transformation: one-hot encoding, feature engineering, normalization, and standardization."""
         print("\nStarting Data Transformation:")
@@ -139,11 +140,14 @@ class Churn_Analysis:
         self.transformed_data = self.data.copy()
         print("\nData transformation completed!")
 
+
     def run_analysis(self):
         """ Running the complete churn analysis """
         print("\n Starting full analysis of the dataset")
         self.preprocess_data()
+
         self.transform_data()
+
 
 
 
