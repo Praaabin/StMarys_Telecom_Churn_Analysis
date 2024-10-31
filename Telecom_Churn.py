@@ -3,6 +3,9 @@ import pandas as pd
 import seaborn as sns
 from matplotlib import pyplot as plt
 from sklearn.cluster import KMeans
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, precision_score, recall_score, roc_auc_score, roc_curve
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, MinMaxScaler, StandardScaler
 from scipy.stats import ttest_ind
 
@@ -248,7 +251,54 @@ class Churn_Analysis:
         plt.legend(title='Cluster')
         plt.show()
 
+        print("\n clustering completed!")
 
+
+    def regression_analysis(self):
+        """Develop and evaluate a logistic regression model to predict customer churn."""
+        print("\n Starting Logistic Regression Analysis: ")
+
+        # Prepare data for logistic regression
+        # Separate features and target variable (assuming 'Churn_Yes' column represents churn)
+        X = self.data.drop(columns=['Churn_Yes', 'Cluster'])  # Features
+        y = self.data['Churn_Yes']  # Target variable (1 for churned, 0 for not churned)
+
+        # Split the dataset into training and testing sets
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+        # Train the logistic regression model
+        model = LogisticRegression(max_iter=1000, random_state=42)
+        model.fit(X_train, y_train)
+        print("\nLogistic Regression model trained.")
+
+        # Make predictions
+        y_pred = model.predict(X_test)
+        y_pred_proba = model.predict_proba(X_test)[:, 1]  # Probabilities for the positive class (churn)
+
+        # Evaluate the model
+        accuracy = accuracy_score(y_test, y_pred)
+        precision = precision_score(y_test, y_pred)
+        recall = recall_score(y_test, y_pred)
+        roc_auc = roc_auc_score(y_test, y_pred_proba)
+
+        print("\nModel Evaluation:")
+        print(f"Accuracy: {accuracy:.4f}")
+        print(f"Precision: {precision:.4f}")
+        print(f"Recall: {recall:.4f}")
+        print(f"ROC AUC: {roc_auc:.4f}")
+
+        # Plot the ROC Curve
+        fpr, tpr, _ = roc_curve(y_test, y_pred_proba)
+        plt.figure(figsize=(10, 6))
+        plt.plot(fpr, tpr, label=f'ROC Curve (AUC = {roc_auc:.4f})')
+        plt.plot([0, 1], [0, 1], 'k--')  # Diagonal line for random guessing
+        plt.xlabel('False Positive Rate')
+        plt.ylabel('True Positive Rate')
+        plt.title('ROC Curve for Logistic Regression Model')
+        plt.legend(loc='lower right')
+        plt.show()
+
+        print("\nLogistic regression analysis completed!")
 
 
     def run_analysis(self):
@@ -259,6 +309,7 @@ class Churn_Analysis:
         self.descriptive_statistics()
         self.inferential_statistics()
         self.clustering()
+        self.regression_analysis()
 
 
 
