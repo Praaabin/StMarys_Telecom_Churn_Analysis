@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from matplotlib import pyplot as plt
+from sklearn.cluster import KMeans
 from sklearn.preprocessing import OneHotEncoder, MinMaxScaler, StandardScaler
 from scipy.stats import ttest_ind
 
@@ -199,6 +200,55 @@ class Churn_Analysis:
 
         print("\n Inferential statistics completed! ")
 
+    def clustering(self):
+        """Determining optimal clusters, applying K-means, and visualizing labeled clusters."""
+        print("\n  Starting Clustering Analysis:  ")
+
+        # Elbow Method for determining optimal k
+        features = self.data[['MonthlyCharges', 'TotalCharges']]
+        wcss = []  # Within-Cluster Sum of Squares
+        for k in range(1, 11):
+            kmeans = KMeans(n_clusters=k, max_iter=5000, random_state=42)
+            kmeans.fit(features)
+            wcss.append(kmeans.inertia_)
+
+        # Ploting WCSS to visualize the elbow point
+        plt.figure(figsize=(10, 6))
+        plt.plot(range(1, 11), wcss, marker='o')
+        plt.xlabel('Number of Clusters')
+        plt.ylabel('Within-Cluster Sum of Squares (WCSS)')
+        plt.title('Elbow Method for Optimal k')
+        plt.show()
+
+        # Applying K-means clustering with optimal k determined from the elbow plot
+        optimal_k = 3  # Choosing from the elbow plot observation
+        kmeans = KMeans(n_clusters=optimal_k, max_iter=5000, random_state=42)
+        self.data['Cluster'] = kmeans.fit_predict(features)
+
+        # Calculating means to understand cluster characteristics
+        cluster_means = self.data.groupby('Cluster')[['MonthlyCharges', 'TotalCharges']].mean()
+        print("\n Cluster Means (Standardized):")
+        print(cluster_means)
+
+        # Labeling clusters based on standardized mean characteristics
+        # Adjusting labels based on cluster_means output
+        cluster_labels = {
+            0: 'Low Monthly & Low Total Charges',  # If cluster is 0, it shows lower means.
+            1: 'High Monthly & High Total Charges',  # If cluster is 1, it shows higher means.
+            2: 'High Monthly but Moderate Total Charges'  # If cluster is 2, shows mixed means.
+        }
+        self.data['Cluster'] = self.data['Cluster'].map(cluster_labels)
+
+        # Visualizing clusters
+        plt.figure(figsize=(10, 6))
+        sns.scatterplot(data=self.data, x='MonthlyCharges', y='TotalCharges', hue='Cluster', palette='viridis')
+        plt.title('Customer segments by Monthly and Total Charges')
+        plt.xlabel('Monthly Charges')
+        plt.ylabel('Total Charges')
+        plt.legend(title='Cluster')
+        plt.show()
+
+
 
 
     def run_analysis(self):
@@ -208,6 +258,7 @@ class Churn_Analysis:
         self.transform_data()
         self.descriptive_statistics()
         self.inferential_statistics()
+        self.clustering()
 
 
 
