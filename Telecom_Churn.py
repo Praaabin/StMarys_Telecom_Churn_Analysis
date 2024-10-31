@@ -3,6 +3,7 @@ import pandas as pd
 import seaborn as sns
 from matplotlib import pyplot as plt
 from sklearn.preprocessing import OneHotEncoder, MinMaxScaler, StandardScaler
+from scipy.stats import ttest_ind
 
 
 class Churn_Analysis:
@@ -25,8 +26,8 @@ class Churn_Analysis:
 
     def preprocess_data(self):
         """ Comprehensive data preprocessing and cleaning """
-        print("\n=== Starting Data Preprocessing ===")
-        print(f"Initial shape of the dataset: {self.data.shape}")
+        print("\n     Starting Data Preprocessing:  ")
+        print(f"Original structure of the dataset: {self.data.shape}")
 
         # 1. Remove duplicates
         num_duplicates = self.data.duplicated().sum()
@@ -171,6 +172,33 @@ class Churn_Analysis:
 
         print("\nDescriptive Statistics of the transformed Data completed !")
 
+    def inferential_statistics(self):
+        """Performing  hypothesis testing to determine significant differences between churned and non-churned customers."""
+        print("\n  Starting Inferential Statistics: ")
+
+        # Separating the data into churned and non-churned groups
+        churned = self.data[self.data['Churn_Yes'] == 1]
+        non_churned = self.data[self.data['Churn_Yes'] == 0]
+
+        # Making List of numerical columns to test
+        numerical_columns = ['MonthlyCharges', 'TotalCharges', 'tenure']
+
+        # Performing t-tests for each numerical column
+        for col in numerical_columns:
+            t_stat, p_value = ttest_ind(churned[col], non_churned[col], equal_var=False)  # Welch's t-test
+            print(f"\nT-Test for {col}:")
+            print(f"T-Statistic: {t_stat:.4f}, P-Value: {p_value:.4f}")
+
+            # Interpreting of p-value
+            if p_value < 0.05:
+                print(
+                    f"Result: Yes, there is a statistically significant difference in {col} between churned and non-churned customers.")
+            else:
+                print(
+                    f"Result: No, there is not statistically significant difference in {col} between churned and non-churned customers.")
+
+        print("\n Inferential statistics completed! ")
+
 
 
     def run_analysis(self):
@@ -179,6 +207,7 @@ class Churn_Analysis:
         self.preprocess_data()
         self.transform_data()
         self.descriptive_statistics()
+        self.inferential_statistics()
 
 
 
