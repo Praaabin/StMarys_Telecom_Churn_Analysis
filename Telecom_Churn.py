@@ -104,13 +104,13 @@ class Churn_Analysis:
         print("\nOne-hot encoding completed.")
 
         # Printing the dataset after one-hot encoding
-        print("\n=== Dataset After One-Hot Encoding ===")
+        print("\nDataset After One-Hot Encoding:")
         print(self.data.head())  # Shows the first few rows after one-hot encoding
 
         # Showing Original Descriptive Statistics before normalizing and standardizing Monthly charges and Total charges.
         columns_to_describe = ['SeniorCitizen', 'tenure', 'MonthlyCharges', 'TotalCharges', 'Churn_Yes']
         original_stats = self.data[columns_to_describe].describe().round(2)
-        print("\n=== Descriptive Statistics for Original Data ===")
+        print("\nDescriptive Statistics for Original Data:")
         print(original_stats)
 
         # Creating new feature "TotalCharges" if it doesn't exist
